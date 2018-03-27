@@ -1,0 +1,62 @@
+### 生产环境
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://192.168.3.159/sell?characterEncoding=utf-8&useSSL=false
+  ### 产品环境可以不要打印sql
+  #jpa:
+   # show-sql: true
+  redis:
+    host: 192.168.3.159
+    port: 6379
+    
+  #此配置可以让json 格式返回的数据为null 时不显示
+  #jackson:
+   #  default-property-inclusion: non_null
+
+
+server:
+  context-path: /sell
+
+###配置微信公众号信息的相关参数
+wechat:
+  mpAppId: wx66a696997d004341
+  mpAppSecret: 5bf53f840b676e1c08fc5e4c8102645d
+  openAppId: wx6ad144e54af67d87
+  openAppSecret: 91a2ff6d38a2bbccfb7e9xxxxxx
+  mchId: 1409146202
+  mchKey: c976503d34ca432c601361f969fd8d85
+  keyPath: /var/weixin_cert/h5.p12
+  notifyUrl: http://20nz264316.imwork.net/sell/pay/notify
+  templateId:
+    orderStatus: r3mvB5YGN2OAJCujyF08erjPozkpww_6ka6mQ4YA_Nw
+
+###配置项目的路径参数
+projectUrl:
+  wechatMpAuthorize: http://20nz264316.imwork.net
+  wechatOpenAuthorize: http://20nz264316.imwork.net
+  sell: http://20nz264316.imwork.net
+
+
+###设置mybatis 的sql语句显示  可以用日志的形式来显示
+logging:
+  level:
+    com.ht.dataobject.mapper: trace
+
+###配置mybatis 的扫描的xml的配置文件的路径
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+
+#设置日志  这种配置比较简单
+#项目中一般不会用这种方式  一般会用新建一个xml文件来配置  本项目使用 logback-spring.xml 配置文件来配置日志
+#pattern console: 表示控制台输出信息  %d 表示时间 %msg 表示日志信息 %n 表示换行
+#path : 表示输出的日志文件的路径
+#file: 表示输出的日志文件的名字 有了这个 可以不需要path的配置
+#level: 表示输出的日志基本
+#logging:
+#pattern:
+#console: "%d --- %msg %n"
+#file: E:\IdeaWorkSpaceLog\sell logs\sell.%d.log
+#level: info

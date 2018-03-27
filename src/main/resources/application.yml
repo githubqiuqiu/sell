@@ -1,0 +1,4 @@
+### 默认选择开发环境启动
+spring:
+  profiles:
+    active: dev

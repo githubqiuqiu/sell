@@ -1,0 +1,53 @@
+外网访问地址 :qiuqiuqiu.55555.io  或者 20nz264316.imwork.net:37670
+域名 qiuqiuqiu.55555.io:12766  或者 20nz264316.imwork.net:37670
+
+测试内网穿透地址:http://qiuqiuqiu.55555.io/sell/buyer/product/list
+    http://20nz264316.imwork.net/sell/buyer/product/list
+
+进入https://mp.weixin.qq.com/debug/cgi-bin/sandboxinfo?action=showinfo&t=sandbox/index
+拿到测试号信息
+appID:wx66a696997d004341
+appsecret:5bf53f840b676e1c08fc5e4c8102645d
+
+调用下面的方法  拿到openid :o_Ee21XqMhCqoJS9eack7D8zF-Oo
+
+微信授权步骤:
+1.设置域名:
+    ---> 在花生壳开通一个内网穿透  花生壳会赠送一个二级域名 开通内网穿透后  点击内网穿透进入花生壳的网页
+    点击添加映射  应用名称可以随便写  内网主机填 本机的ip 内网端口写 8080 外网端口选择临时端口
+
+
+2.开启项目测试内网是否能访问成功:
+    ---> 进入https://mp.weixin.qq.com/debug/cgi-bin/sandboxinfo?action=showinfo&t=sandbox/index
+    找到--->体验接口权限表--->网页帐号	网页授权获取用户基本信息--->修改 --->填写刚刚内网穿透成功的域名--->20nz264316.imwork.net:33411
+    在刚刚配置映射的地方 找到外网访问地址  使用外网访问地址 +项目路径 访问项目
+    例如--->http://20nz264316.imwork.net:33411/sell/buyer/product/list  能访问成功  说明内网穿透成功
+
+
+3.获取code:
+    ---->进入https://mp.weixin.qq.com/debug/cgi-bin/sandboxinfo?action=showinfo&t=sandbox/index
+    找到--->测试号二维码--->用手机微信关注二维码
+   进入https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421140842 找到---> 第一步：用户同意授权，获取code
+   复制下面的地址--->https://open.weixin.qq.com/connect/oauth2/authorize?appid=APPID&redirect_uri=REDIRECT_URI&response_type=code&scope=SCOPE&state=STATE#wechat_redirect
+   appid填写测试号的appID  redirect_uri 跳转回调的路径 例如 http://20nz264316.imwork.net:37670/sell/weixin/auth  scope 填写snsapi_base 或者snsapi_userinfo  详情看上面的网址里有介绍
+   完整的路径例如本项目的
+    https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx66a696997d004341&redirect_uri=http://20nz264316.imwork.net:37670/sell/weixin/auth&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect
+    https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx66a696997d004341&redirect_uri=http://qiuqiuqiu.55555.io/sell/weixin/auth&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect
+
+    当参数scope=snsapi_base时  返回的参数是response={"access_token":"7_AwBnsjIg6Njtr0Zyq4yfRVHoN-_Ws8i80C_19mDQrzx0vXyM2xXa_36yWh6EBsMbF12mOlzgPQcYqnT9sAD0Oilmo_8DDyBK3U3nEOGIJ6o","expires_in":7200,"refresh_token":"7_N6YngmFzRiyIvYikKuSTmFGKbsntfSB781dLeOFtK6aWVGL5n9qV6KHxYLOrbz6zWURfKNmo0irpMWZc9u43Vsm7fP6PPllX0UYCdBPBeHI","openid":"o_Ee21XqMhCqoJS9eack7D8zF-Oo","scope":"snsapi_base"}
+    当参数scope=snsapi_userinfo时  返回的参数是
+
+   当用浏览器打开该网页  会显示--->请用微信客户端打开  这时候可以将这段网址 发送到微信团队或者文件助手中  然后在手机微信中打开该网页 网页一片空白 但是后台返回拿到了 code
+    code说明 ： code作为换取access_token的票据，每次用户授权带上的code将不一样，code只能使用一次，5分钟未被使用自动过期。
+
+4.通过code换取网页授权access_token:
+    --->获取code后，请求以下链接获取access_token：  https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code
+    appid 填写测试号的appID   secret 填写测试号的appsecret   code是上一步拿到的code  grant_type不需要改
+    完整的路径例如本项目的 --->注意修改code为上一步的code
+    https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx66a696997d004341&secret=5bf53f840b676e1c08fc5e4c8102645d&code=CODE&grant_type=authorization_code
+    使用:
+    String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx66a696997d004341&secret=5bf53f840b676e1c08fc5e4c8102645d&code=" + code + "&grant_type=authorization_code";
+    RestTemplate restTemplate = new RestTemplate();
+    //发送一个http get请求 返回的请求体将映射为一个对象
+    String response = restTemplate.getForObject(url, String.class);
+    得到一个String的json格式的字符串 里面有我们想要的 openid:o_Ee21XqMhCqoJS9eack7D8zF-Oo

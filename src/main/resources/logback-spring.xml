@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- 根节点 配置文件的信息 -->
+<configuration>
+    <!-- 意思是 该配置项 需要用ConsoleAppender这个类来处理  表示控制台输出的日志信息 -->
+    <appender name="consoleLog" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- 配置展现的形式 -->
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <!-- 配置具体的形式 %d 表示当前时间 %msg 表示当前的消息 %n 表示换行-->
+            <pattern>
+                %d --- %msg %n
+            </pattern>
+        </layout>
+    </appender>
+
+    <!-- 对info日志每天输出的配置 滚动的日志输出形式 -->
+    <appender name="fileInfoLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 过滤不是info等级的信息   -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <!-- 表示如果是ERROR 就禁止掉 -->
+            <onMatch>DENY</onMatch>
+            <!-- 反之 使用这条规则 如果上面的level是ERROR 则这个配置会输出 WARN 和 INFO日志  -->
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+
+        <!-- 这里就不叫layout了 叫encoder-->
+        <encoder>
+            <pattern>
+                %d --- %msg %n
+            </pattern>
+        </encoder>
+        <!-- 配置一个滚动策略  每天一个日志文件 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 配置一个存放日志的路径 -->
+            <fileNamePattern>
+                E:\IdeaWorkSpaceLog\sell logs\info.%d.log
+            </fileNamePattern>
+        </rollingPolicy>
+    </appender>
+
+    <!-- 对error日志每天输出的配置 滚动的日志输出形式 -->
+    <appender name="fileErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 过滤不是error等级的信息  根据等级过滤  使用ThresholdFilter类过滤  会输出包括自己和比自己等级高的日志-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+
+        <!-- 这里就不叫layout了 叫encoder-->
+        <encoder>
+            <pattern>
+                %d --- %msg %n
+            </pattern>
+        </encoder>
+        <!-- 配置一个滚动策略  每天一个日志文件 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 配置一个存放日志的路径 -->
+            <fileNamePattern>
+                E:\IdeaWorkSpaceLog\sell logs\error.%d.log
+            </fileNamePattern>
+        </rollingPolicy>
+    </appender>
+
+
+    <!-- 把配置项 链接到什么地方 -->
+    <root level="info">
+        <!-- 引用某个配置项 -->
+        <appender-ref ref="consoleLog"  />
+        <appender-ref ref="fileInfoLog"  />
+        <appender-ref ref="fileErrorLog"  />
+    </root>
+
+</configuration>

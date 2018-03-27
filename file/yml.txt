@@ -1,0 +1,32 @@
+
+
+#设置日志  这种配置比较简单
+#项目中一般不会用这种方式  一般会用新建一个xml文件来配置  本项目使用 logback-spring.xml 配置文件来配置日志
+#pattern console: 表示控制台输出信息  %d 表示时间 %msg 表示日志信息 %n 表示换行
+#path : 表示输出的日志文件的路径
+#file: 表示输出的日志文件的名字 有了这个 可以不需要path的配置
+#level: 表示输出的日志基本
+#logging:
+#pattern:
+#console: "%d --- %msg %n"
+#file: E:\IdeaWorkSpaceLog\sell logs\sell.%d.log
+#level: info
+
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://192.168.3.159/sell?characterEncoding=utf-8&useSSL=false
+  ### 显示sql
+  jpa:
+    show-sql: true
+  ### 设置数据为null 不返回
+  jackson:
+    default-property-inclusion: non_null
+
+
+    ### 设置上下文路径
+    server:
+      context-path: /sell

@@ -1,0 +1,46 @@
+1.首先将手机和电脑上的wifi连通  在手机上wifi设置 http代理为手动  服务器填写电脑的 ip地址 例如 192.168.3.122  端口填 8888
+然后把电脑上安装的抓包工具 charles打开
+
+2.查看电脑上C:\Windows\System32\drivers\etc 下的hosts文件
+看是否配置了 虚拟机地址 sell.com  例如: 192.168.3.159  sell.com
+此配置的意思就是  当我们在电脑上访问 sell.com时   会帮我们把请求转到虚拟机的前端项目上  然后会告诉我们在微信客户端打开(手机微信访问)
+
+
+3.当我们用手机微信访问了sell.com的时候  会指向到虚拟机的前端项目  根据抓包工具显示  前端项目配置的是请求先到了查询商品列表的URL: sell/buyer/product/list
+  然后前端项目配置了 判断用户访问sell.com的时候 是否带有用户的openid
+  (访问都没用带openid  openid需要用微信的code来换取access_token 然后在access_token里面获取)没有就跳转到了前端项目设置的获取微信code的URL:sell/wechat/authorize?returnUrl=sell.com
+  然后根据配置文件里面的测试号的appid和appsecret 以及 设置的回调路径  然后重定向到获取微信code的方法
+  当方法完成后  微信会帮我们重定向到我们自己穿进去的redirect_uri参数上的url
+  然后我们在自己定义的获取openid的方法上  获取微信的code 和state(可以设置成我们拿到openid后要跳转的页面 本项目设置的是 sell.com)
+
+  当微信帮我们重定向会获取openid的方法的时候（/sell/wechat/userInfo） 我们根据code 调用获取微信access_token的方法
+  拿到access_token后  我们就可以获取到用户的openid  那到用户的openid后  我们可以拼接参数上获取的url地址和openid
+  重新跳转回我们的商品详情页面  但是这时候我们的商品详情页面就有了微信的openid了
+  然后跳转到商品详情页之前  根据抓包工具显示  前端配置会查询商品列表  然后加载静态资源  这样我们手机微信上就可以看到一个完整的页面了
+
+  为什么前端项目只需要设置一个获取参数的路径就可以访问到我们后台的数据呢 前端项目在虚拟机内 后端项目在windows内
+  是因为我们在花生壳上设置的windows的内网穿透  绑定一个域名 就可以直接访问到我们windows上
+  因为我们在nginx(虚拟机的nginx的配置文件地址在 /usr/local/nginx/conf)的配置文件nginx.conf里面配置了
+  server {
+         listen       80;
+         server_name sell.com;
+         #charset koi8-r;
+         #access_log  logs/host.access.log  main;
+         location / {
+             root   /opt/data/wwwroot/sell;
+             index  index.html index.htm;
+         }
+         location /sell/ {
+             proxy_pass http://192.168.3.122:8080/sell/;
+         }
+
+         代理地址指向了我们windows本机上的sell项目 所以前端的地址可以访问到我们后端的数据
+         因为我不知道项目的前端是什么样的 只能猜测 前端的一些配置写在虚拟机的地址:/opt/code/sell_fe_buyer/config  路径下的index.js
+         里面有三段重要的配置   第一行我感觉是项目的路径  第二段我感觉是 如果访问sell.com没有openid的话 就跳转到第二段路径里面获取code 在根据第二段url里的逻辑获取openid
+         第三段配置是跳转到 微信支付的页面 创建微信支付的预付款订单
+              sellUrl: 'http://sell.com',
+              openidUrl: 'http://20nz264316.imwork.net/sell/wechat/authorize',
+              wechatPayUrl: 'http://20nz264316.imwork.net/sell/pay/create'
+
+
+
